@@ -47,6 +47,15 @@
     }];    
     
     STAssertEquals(i, 1, nil);
+    
+    // count players with number >= 29
+    i = 0;
+    
+    [rxml iterateChildrenMatchingXPathQuery:@"//player[number(@number) >= 29]" usingBlock:^(RXMLElement *element) {
+        i++;
+    }];
+    
+    STAssertEquals(i, 4, nil);
 }
 
 @end

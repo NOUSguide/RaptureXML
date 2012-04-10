@@ -29,10 +29,15 @@
 //
 
 #import "RXMLElement.h"
+//#import <libxml/tree.h>
+#import <libxml/parser.h>
+#import <libxml/HTMLparser.h>
+#import <libxml/xpath.h>
+#import <libxml/xpathInternals.h>
 
 @interface RXMLElement () {
-    xmlDocPtr document_;
-    xmlNodePtr node_;
+    xmlDocPtr _document;
+    xmlNodePtr _node;
 }
 
 - (void)setupWithData:(NSData *)data;
@@ -97,8 +102,8 @@
 
 - (id)initWithNode:(xmlNodePtr)node {
     if ((self = [super init])) {
-        document_ = nil;
-        node_ = node;
+        _document = nil;
+        _node = node;
     }
     
     return self;        
@@ -129,8 +134,8 @@
 }
 
 - (void)dealloc {
-    if (document_ != nil) {
-        xmlFreeDoc(document_);
+    if (_document != nil) {
+        xmlFreeDoc(_document);
     }
 }
 
@@ -147,11 +152,11 @@
 ////////////////////////////////////////////////////////////////////////
 
 - (NSString *)tagName {
-    return [NSString stringWithUTF8String:(const char *)node_->name];
+    return [NSString stringWithUTF8String:(const char *)_node->name];
 }
 
 - (NSString *)text {
-    xmlChar *key = xmlNodeGetContent(node_);
+    xmlChar *key = xmlNodeGetContent(_node);
     NSString *text = (key ? [NSString stringWithUTF8String:(const char *)key] : @"");
     xmlFree(key);
     
@@ -167,7 +172,7 @@
 }
 
 - (NSString *)attribute:(NSString *)attributeName {
-    const unsigned char *attributeValueC = xmlGetProp(node_, (const xmlChar *)[attributeName cStringUsingEncoding:NSUTF8StringEncoding]);        
+    const unsigned char *attributeValueC = xmlGetProp(_node, (const xmlChar *)[attributeName cStringUsingEncoding:NSUTF8StringEncoding]);        
     
     if (attributeValueC != NULL) {
         return [NSString stringWithUTF8String:(const char *)attributeValueC];
@@ -177,7 +182,7 @@
 }
 
 - (NSString *)attribute:(NSString *)attributeName inNamespace:(NSString *)xmlNamespace {
-    const unsigned char *attributeValueC = xmlGetNsProp(node_, (const xmlChar *)[attributeName cStringUsingEncoding:NSUTF8StringEncoding], (const xmlChar *)[xmlNamespace cStringUsingEncoding:NSUTF8StringEncoding]);
+    const unsigned char *attributeValueC = xmlGetNsProp(_node, (const xmlChar *)[attributeName cStringUsingEncoding:NSUTF8StringEncoding], (const xmlChar *)[xmlNamespace cStringUsingEncoding:NSUTF8StringEncoding]);
     
     if (attributeValueC != NULL) {
         return [NSString stringWithUTF8String:(const char *)attributeValueC];
@@ -203,7 +208,7 @@
 }
 
 - (BOOL)isValid {
-    return document_ != nil;
+    return _document != nil;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -212,7 +217,7 @@
 
 - (RXMLElement *)childWithTagName:(NSString *)tagName {
     NSArray *components = [tagName componentsSeparatedByString:@"."];
-    xmlNodePtr currentNode = node_;
+    xmlNodePtr currentNode = _node;
     
     // navigate down
     for (NSString *currentTagName in components) {
@@ -249,7 +254,7 @@
 
 - (RXMLElement *)childWithTagName:(NSString *)tagName inNamespace:(NSString *)xmlNamespace {
     NSArray *components = [tagName componentsSeparatedByString:@"."];
-    xmlNodePtr currentNode = node_;
+    xmlNodePtr currentNode = _node;
     const xmlChar *namespaceC = (const xmlChar *)[xmlNamespace cStringUsingEncoding:NSUTF8StringEncoding];
     
     // navigate down
@@ -288,7 +293,7 @@
 - (NSArray *)childrenWithTagName:(NSString *)tagName {
     const xmlChar *tagNameC = (const xmlChar *)[tagName cStringUsingEncoding:NSUTF8StringEncoding];
     NSMutableArray *children = [NSMutableArray array];
-    xmlNodePtr currentNode = node_->children;
+    xmlNodePtr currentNode = _node->children;
     
     while (currentNode != NULL) {
         if (currentNode->type == XML_ELEMENT_NODE && xmlStrcmp(currentNode->name, tagNameC) == 0) {
@@ -305,7 +310,7 @@
     const xmlChar *tagNameC = (const xmlChar *)[tagName cStringUsingEncoding:NSUTF8StringEncoding];
     const xmlChar *namespaceC = (const xmlChar *)[xmlNamespace cStringUsingEncoding:NSUTF8StringEncoding];
     NSMutableArray *children = [NSMutableArray array];
-    xmlNodePtr currentNode = node_->children;
+    xmlNodePtr currentNode = _node->children;
     
     while (currentNode != NULL) {
         if (currentNode->type == XML_ELEMENT_NODE && xmlStrcmp(currentNode->name, tagNameC) == 0 && xmlStrcmp(currentNode->ns->href, namespaceC) == 0) {
@@ -323,8 +328,12 @@
 ////////////////////////////////////////////////////////////////////////
 
 - (void)iteratePath:(NSString *)path usingBlock:(RXMLBlock)block {
+    if (block == nil) {
+        return;
+    }
+    
     NSArray *components = [path componentsSeparatedByString:@"."];
-    xmlNodePtr currentNode = node_;
+    xmlNodePtr currentNode = _node;
     
     // navigate down
     for (NSUInteger i=0; i < components.count; ++i) {
@@ -392,9 +401,54 @@
 }
 
 - (void)iterateElements:(NSArray *)elements usingBlock:(RXMLBlock)block {
-    for (RXMLElement *element in elements) {
-        block(element);
+    if (block != nil) {
+        for (RXMLElement *element in elements) {
+            block(element);
+        }
     }
+}
+
+////////////////////////////////////////////////////////////////////////
+#pragma mark - XPath
+////////////////////////////////////////////////////////////////////////
+
+- (NSArray *)childrenMatchingXPathQuery:(NSString *)query {
+    xmlXPathContextPtr context = xmlXPathNewContext(_document);
+    
+    if (context == NULL) {
+		return nil;
+    }
+    
+    xmlXPathObjectPtr object = xmlXPathEvalExpression((xmlChar *)[query cStringUsingEncoding:NSUTF8StringEncoding], context);
+    if(object == NULL) {
+		return nil;
+    }
+	
+	xmlNodeSetPtr nodes = object->nodesetval;
+	if (nodes == NULL) {
+		return nil;
+	}
+	
+	NSMutableArray *resultNodes = [NSMutableArray array];
+	
+    for (NSInteger i = 0; i < nodes->nodeNr; i++) {
+		RXMLElement *element = [RXMLElement elementWithNode:nodes->nodeTab[i]];
+        
+		if (element != NULL) {
+			[resultNodes addObject:element];
+		}
+	}
+    
+    xmlXPathFreeObject(object);
+    xmlXPathFreeContext(context); 
+    
+    return resultNodes;
+}
+
+- (void)iterateChildrenMatchingXPathQuery:(NSString *)query usingBlock:(RXMLBlock)block {
+    NSArray *children = [self childrenMatchingXPathQuery:query];
+    
+    [self iterateElements:children usingBlock:block];
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -402,14 +456,14 @@
 ////////////////////////////////////////////////////////////////////////
 
 - (void)setupWithData:(NSData *)data {
-    document_ = xmlReadMemory([data bytes], (int)[data length], "", nil, XML_PARSE_RECOVER);
+    _document = xmlReadMemory([data bytes], (int)[data length], "", nil, XML_PARSE_RECOVER);
     
     if ([self isValid]) {
-        node_ = xmlDocGetRootElement(document_);
+        _node = xmlDocGetRootElement(_document);
         
-        if (node_ == NULL) {
-            xmlFreeDoc(document_);
-            document_ = nil;
+        if (_node == NULL) {
+            xmlFreeDoc(_document);
+            _document = nil;
         }
     }
 }

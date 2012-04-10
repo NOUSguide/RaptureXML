@@ -76,4 +76,7 @@ typedef void (^RXMLBlock)(RXMLElement *element);
 - (void)iteratePath:(NSString *)path usingBlock:(RXMLBlock)block;
 - (void)iterateElements:(NSArray *)elements usingBlock:(RXMLBlock)block;
 
+- (NSArray *)childrenMatchingXPathQuery:(NSString *)query;
+- (void)iterateChildrenMatchingXPathQuery:(NSString *)query usingBlock:(RXMLBlock)block;
+
 @end
