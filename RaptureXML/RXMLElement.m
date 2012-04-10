@@ -4,6 +4,7 @@
 //
 // ================================================================================================
 //  Created by John Blanco on 9/23/11.
+//  Modified and extended by Matthias Tretter (@myell0w)
 //  Version 1.4
 //  
 //  Copyright (c) 2011 John Blanco
