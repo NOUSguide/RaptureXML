@@ -56,6 +56,10 @@
     }];
     
     STAssertEquals(i, 4, nil);
+    
+    [rxml iterateChildrenMatchingXPathQuery:@"//teams/team" usingBlock:^(RXMLElement *element) {
+        STAssertTrue(element.attributes.allKeys.count == 2, nil);
+    }];
 }
 
 @end

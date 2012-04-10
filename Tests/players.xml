@@ -5,8 +5,8 @@
             <experience>
                 <years>1</years>
                 <teams>
-                    <team>53</team>
-                    <team>12</team>
+                    <team bestPosition="1" worstPosition="6">53</team>
+                    <team bestPosition="2" worstPosition="4">12</team>
                 </teams>
             </experience>
         </coach>

@@ -151,6 +151,29 @@
 #pragma mark - Getter
 ////////////////////////////////////////////////////////////////////////
 
+- (NSDictionary *)attributes {
+    xmlAttr *attribute = _node->properties;
+    NSMutableDictionary *attributes = [NSMutableDictionary dictionary];
+    
+    while (attribute != NULL) {
+        NSString *attributeName = nil;
+        NSString *attributeValue = nil;
+        
+        if (attribute->name && attribute->children && attribute->children->type == XML_TEXT_NODE && attribute->children->content) {
+            attributeName = [NSString stringWithCString:(const char *)attribute->name encoding:NSUTF8StringEncoding];
+            attributeValue = [NSString stringWithCString:(const char *)attribute->children->content encoding:NSUTF8StringEncoding];
+            
+            if (attributeName != nil && attributeValue != nil) {
+                [attributes setObject:attributeValue forKey:attributeName];
+            }
+        }
+        
+        attribute = attribute->next;
+    }
+    
+    return [attributes copy];
+}
+
 - (NSString *)tagName {
     return [NSString stringWithUTF8String:(const char *)_node->name];
 }
