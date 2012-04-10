@@ -29,9 +29,6 @@
 //
 
 #import "RXMLElement.h"
-//#import <libxml/tree.h>
-#import <libxml/parser.h>
-#import <libxml/HTMLparser.h>
 #import <libxml/xpath.h>
 #import <libxml/xpathInternals.h>
 
@@ -44,7 +41,11 @@
 
 @end
 
-@implementation RXMLElement 
+@implementation RXMLElement
+
+@synthesize attributes = _attributes;
+@synthesize text = _text;
+@synthesize tagName = _tagName;
 
 ////////////////////////////////////////////////////////////////////////
 #pragma mark - Lifecycle
@@ -144,7 +145,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 - (NSString *)description {
-    return [self text];
+    return self.text;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -152,38 +153,51 @@
 ////////////////////////////////////////////////////////////////////////
 
 - (NSDictionary *)attributes {
-    xmlAttr *attribute = _node->properties;
-    NSMutableDictionary *attributes = [NSMutableDictionary dictionary];
-    
-    while (attribute != NULL) {
-        NSString *attributeName = nil;
-        NSString *attributeValue = nil;
+    if (_attributes == nil) {
+        xmlAttr *attribute = _node->properties;
+        NSMutableDictionary *mutableAttributes = [NSMutableDictionary dictionary];
         
-        if (attribute->name && attribute->children && attribute->children->type == XML_TEXT_NODE && attribute->children->content) {
-            attributeName = [NSString stringWithCString:(const char *)attribute->name encoding:NSUTF8StringEncoding];
-            attributeValue = [NSString stringWithCString:(const char *)attribute->children->content encoding:NSUTF8StringEncoding];
+        while (attribute != NULL) {
+            NSString *attributeName = nil;
+            NSString *attributeValue = nil;
             
-            if (attributeName != nil && attributeValue != nil) {
-                [attributes setObject:attributeValue forKey:attributeName];
+            if (attribute->name && attribute->children && attribute->children->type == XML_TEXT_NODE && attribute->children->content) {
+                attributeName = [NSString stringWithCString:(const char *)attribute->name encoding:NSUTF8StringEncoding];
+                attributeValue = [NSString stringWithCString:(const char *)attribute->children->content encoding:NSUTF8StringEncoding];
+                
+                if (attributeName != nil && attributeValue != nil) {
+                    [mutableAttributes setObject:attributeValue forKey:attributeName];
+                }
             }
+            
+            attribute = attribute->next;
         }
         
-        attribute = attribute->next;
+        _attributes = [mutableAttributes copy];
     }
     
-    return [attributes copy];
+    return _attributes;
 }
 
 - (NSString *)tagName {
-    return [NSString stringWithUTF8String:(const char *)_node->name];
+    if (_tagName == nil) {
+        _tagName = [NSString stringWithUTF8String:(const char *)_node->name];
+    }
+    
+    return _tagName;
 }
 
 - (NSString *)text {
-    xmlChar *key = xmlNodeGetContent(_node);
-    NSString *text = (key ? [NSString stringWithUTF8String:(const char *)key] : @"");
-    xmlFree(key);
+    if (_text == nil) {
+        xmlChar *key = xmlNodeGetContent(_node);
+        
+        if (key != NULL) {
+            _text = [NSString stringWithUTF8String:(const char *)key];
+            xmlFree(key);
+        }
+    }
     
-    return text;
+    return _text;
 }
 
 - (NSInteger)textAsInteger {
@@ -195,13 +209,7 @@
 }
 
 - (NSString *)attribute:(NSString *)attributeName {
-    const unsigned char *attributeValueC = xmlGetProp(_node, (const xmlChar *)[attributeName cStringUsingEncoding:NSUTF8StringEncoding]);        
-    
-    if (attributeValueC != NULL) {
-        return [NSString stringWithUTF8String:(const char *)attributeValueC];
-    }
-    
-    return nil;
+    return [self.attributes objectForKey:attributeName];
 }
 
 - (NSString *)attribute:(NSString *)attributeName inNamespace:(NSString *)xmlNamespace {
@@ -481,12 +489,12 @@
 - (void)setupWithData:(NSData *)data {
     _document = xmlReadMemory([data bytes], (int)[data length], "", nil, XML_PARSE_RECOVER);
     
-    if ([self isValid]) {
+    if (_document != NULL) {
         _node = xmlDocGetRootElement(_document);
         
         if (_node == NULL) {
             xmlFreeDoc(_document);
-            _document = nil;
+            _document = NULL;
         }
     }
 }
