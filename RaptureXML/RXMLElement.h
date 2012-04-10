@@ -52,6 +52,7 @@ typedef void (^RXMLBlock)(RXMLElement *element);
 + (id)elementWithURL:(NSURL *)url;
 + (id)elementWithData:(NSData *)data;
 + (id)elementWithNode:(xmlNodePtr)node;
++ (id)elementWithHTMLData:(NSData *)data;
 
 - (id)initWithString:(NSString *)xmlString encoding:(NSStringEncoding)encoding;
 - (id)initWithFilepath:(NSString *)filename;
@@ -59,6 +60,7 @@ typedef void (^RXMLBlock)(RXMLElement *element);
 - (id)initWithURL:(NSURL *)url;
 - (id)initWithData:(NSData *)data;
 - (id)initWithNode:(xmlNodePtr)node;
+- (id)initWithHTMLData:(NSData *)data;
 
 - (NSString *)attribute:(NSString *)attributeName;
 - (NSString *)attribute:(NSString *)attributeName inNamespace:(NSString *)xmlNamespace;

@@ -30,6 +30,7 @@
 //
 
 #import "RXMLElement.h"
+#import <libxml/HTMLparser.h>
 #import <libxml/xpath.h>
 #import <libxml/xpathInternals.h>
 
@@ -38,7 +39,7 @@
     xmlNodePtr _node;
 }
 
-- (void)setupWithData:(NSData *)data;
+- (void)setupWithData:(NSData *)data isHTML:(BOOL)html;
 
 @end
 
@@ -49,67 +50,8 @@
 @synthesize tagName = _tagName;
 
 ////////////////////////////////////////////////////////////////////////
-#pragma mark - Lifecycle
+#pragma mark - Class Methods
 ////////////////////////////////////////////////////////////////////////
-
-- (id)initWithString:(NSString *)xmlString encoding:(NSStringEncoding)encoding {
-    if ((self = [super init])) {
-        NSData *data = [xmlString dataUsingEncoding:encoding];
-        
-        [self setupWithData:data];
-    }
-    
-    return self;    
-}
-
-- (id)initWithFilepath:(NSString *)filename {
-    if ((self = [super init])) {
-        NSString *fullPath = [[[NSBundle bundleForClass:self.class] bundlePath] stringByAppendingPathComponent:filename];
-        NSData *data = [NSData dataWithContentsOfFile:fullPath];
-        
-        [self setupWithData:data];
-    }
-    
-    return self;    
-}
-
-- (id)initWithFilename:(NSString *)filename extension:(NSString *)extension {
-    if ((self = [super init])) {
-        NSString *fullPath = [[NSBundle bundleForClass:[self class]] pathForResource:filename ofType:extension];
-        NSData *data = [NSData dataWithContentsOfFile:fullPath];
-        
-        [self setupWithData:data];
-    }
-    
-    return self;    
-}
-
-- (id)initWithURL:(NSURL *)url {
-    if ((self = [super init])) {
-        NSData *data = [NSData dataWithContentsOfURL:url];
-        
-        [self setupWithData:data];
-    }
-    
-    return self;    
-}
-
-- (id)initWithData:(NSData *)data {
-    if ((self = [super init])) {
-        [self setupWithData:data];
-    }
-    
-    return self;    
-}
-
-- (id)initWithNode:(xmlNodePtr)node {
-    if ((self = [super init])) {
-        _document = nil;
-        _node = node;
-    }
-    
-    return self;        
-}
 
 + (id)elementWithString:(NSString *)attributeXML_ encoding:(NSStringEncoding)encoding {
     return [[RXMLElement alloc] initWithString:attributeXML_ encoding:encoding];    
@@ -133,6 +75,81 @@
 
 + (id)elementWithNode:(xmlNodePtr)node {
     return [[RXMLElement alloc] initWithNode:node];
+}
+
++ (id)elementWithHTMLData:(NSData *)data {
+    return [[RXMLElement alloc] initWithHTMLData:data];
+}
+
+////////////////////////////////////////////////////////////////////////
+#pragma mark - Lifecycle
+////////////////////////////////////////////////////////////////////////
+
+- (id)initWithString:(NSString *)xmlString encoding:(NSStringEncoding)encoding {
+    if ((self = [super init])) {
+        NSData *data = [xmlString dataUsingEncoding:encoding];
+        
+        [self setupWithData:data isHTML:NO];
+    }
+    
+    return self;    
+}
+
+- (id)initWithFilepath:(NSString *)filename {
+    if ((self = [super init])) {
+        NSString *fullPath = [[[NSBundle bundleForClass:self.class] bundlePath] stringByAppendingPathComponent:filename];
+        NSData *data = [NSData dataWithContentsOfFile:fullPath];
+        
+        [self setupWithData:data isHTML:NO];
+    }
+    
+    return self;    
+}
+
+- (id)initWithFilename:(NSString *)filename extension:(NSString *)extension {
+    if ((self = [super init])) {
+        NSString *fullPath = [[NSBundle bundleForClass:[self class]] pathForResource:filename ofType:extension];
+        NSData *data = [NSData dataWithContentsOfFile:fullPath];
+        
+        [self setupWithData:data isHTML:NO];
+    }
+    
+    return self;    
+}
+
+- (id)initWithURL:(NSURL *)url {
+    if ((self = [super init])) {
+        NSData *data = [NSData dataWithContentsOfURL:url];
+        
+        [self setupWithData:data isHTML:NO];
+    }
+    
+    return self;    
+}
+
+- (id)initWithData:(NSData *)data {
+    if ((self = [super init])) {
+        [self setupWithData:data isHTML:NO];
+    }
+    
+    return self;    
+}
+
+- (id)initWithNode:(xmlNodePtr)node {
+    if ((self = [super init])) {
+        _document = nil;
+        _node = node;
+    }
+    
+    return self;        
+}
+
+- (id)initWithHTMLData:(NSData *)data {
+    if ((self = [super init])) {
+        [self setupWithData:data isHTML:YES];
+    }
+    
+    return self; 
 }
 
 - (void)dealloc {
@@ -487,8 +504,12 @@
 #pragma mark - Private
 ////////////////////////////////////////////////////////////////////////
 
-- (void)setupWithData:(NSData *)data {
-    _document = xmlReadMemory([data bytes], (int)[data length], "", nil, XML_PARSE_RECOVER);
+- (void)setupWithData:(NSData *)data isHTML:(BOOL)html {
+    if (html) {
+        _document = htmlReadMemory(data.bytes, (int)data.length, "", NULL, HTML_PARSE_NOWARNING | HTML_PARSE_NOERROR);
+    } else {
+        _document = xmlReadMemory(data.bytes, (int)data.length, "", nil, XML_PARSE_RECOVER);
+    }
     
     if (_document != NULL) {
         _node = xmlDocGetRootElement(_document);
