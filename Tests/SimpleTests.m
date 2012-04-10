@@ -55,13 +55,13 @@
     
     [rxml iteratePath:@"*" usingBlock:^(RXMLElement *e) {
         if (i == 0) {
-            STAssertEqualObjects(e.tag, @"square", nil);
+            STAssertEqualObjects(e.tagName, @"square", nil);
             STAssertEqualObjects(e.text, @"Square", nil);
         } else if (i == 1) {
-            STAssertEqualObjects(e.tag, @"triangle", nil);            
+            STAssertEqualObjects(e.tagName, @"triangle", nil);            
             STAssertEqualObjects(e.text, @"Triangle", nil);
         } else if (i == 2) {
-            STAssertEqualObjects(e.tag, @"circle", nil);            
+            STAssertEqualObjects(e.tagName, @"circle", nil);            
             STAssertEqualObjects(e.text, @"Circle", nil);
         }
 
