@@ -29,8 +29,8 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <libxml2/libxml/xmlreader.h>
-#import <libxml2/libxml/xmlmemory.h>
+#import <libxml/xmlreader.h>
+#import <libxml/xmlmemory.h>
 
 @class RXMLElement;
 

@@ -146,7 +146,7 @@
 #pragma mark - Getter
 ////////////////////////////////////////////////////////////////////////
 
-- (NSString *)tag {
+- (NSString *)tagName {
     return [NSString stringWithUTF8String:(const char *)node_->name];
 }
 
