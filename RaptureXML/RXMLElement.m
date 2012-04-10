@@ -105,35 +105,33 @@
 }
 
 + (id)elementWithString:(NSString *)attributeXML_ encoding:(NSStringEncoding)encoding {
-    return [[[RXMLElement alloc] initWithString:attributeXML_ encoding:encoding] autorelease];    
+    return [[RXMLElement alloc] initWithString:attributeXML_ encoding:encoding];    
 }
 
 + (id)elementWithFilepath:(NSString *)filename {
-    return [[[RXMLElement alloc] initWithFilepath:filename] autorelease];    
+    return [[RXMLElement alloc] initWithFilepath:filename];    
 }
 
 + (id)elementWithFilename:(NSString *)filename extension:(NSString *)extension {
-    return [[[RXMLElement alloc] initWithFilename:filename extension:extension] autorelease];
+    return [[RXMLElement alloc] initWithFilename:filename extension:extension];
 }
 
 + (id)elementWithURL:(NSURL *)url {
-    return [[[RXMLElement alloc] initWithURL:url] autorelease];
+    return [[RXMLElement alloc] initWithURL:url];
 }
 
 + (id)elementWithData:(NSData *)data {
-    return [[[RXMLElement alloc] initWithData:data] autorelease];
+    return [[RXMLElement alloc] initWithData:data];
 }
 
 + (id)elementWithNode:(xmlNodePtr)node {
-    return [[[RXMLElement alloc] initWithNode:node] autorelease];
+    return [[RXMLElement alloc] initWithNode:node];
 }
 
 - (void)dealloc {
     if (document_ != nil) {
         xmlFreeDoc(document_);
     }
-    
-    [super dealloc];
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -300,7 +298,7 @@
         currentNode = currentNode->next;
     }
     
-    return [[children copy] autorelease];
+    return [children copy];
 }
 
 - (NSArray *)childrenWithTagName:(NSString *)tagName inNamespace:(NSString *)xmlNamespace {
@@ -317,7 +315,7 @@
         currentNode = currentNode->next;
     }
     
-    return [[children copy] autorelease];
+    return [children copy];
 }
 
 ////////////////////////////////////////////////////////////////////////
