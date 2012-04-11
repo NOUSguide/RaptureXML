@@ -339,6 +339,21 @@
     return nil;
 }
 
+- (NSArray *)children {
+    NSMutableArray *children = [NSMutableArray array];
+    xmlNodePtr currentNode = _node->children;
+    
+    while (currentNode != NULL) {
+        if (currentNode->type == XML_ELEMENT_NODE) {
+            [children addObject:[RXMLElement elementWithNode:currentNode]];
+        }
+        
+        currentNode = currentNode->next;
+    }
+    
+    return [children copy];
+}
+
 - (NSArray *)childrenWithTagName:(NSString *)tagName {
     const xmlChar *tagNameC = (const xmlChar *)[tagName cStringUsingEncoding:NSUTF8StringEncoding];
     NSMutableArray *children = [NSMutableArray array];

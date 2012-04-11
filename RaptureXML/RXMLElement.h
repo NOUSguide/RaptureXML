@@ -39,6 +39,7 @@ typedef void (^RXMLBlock)(RXMLElement *element);
 
 @interface RXMLElement : NSObject 
 
+@property (nonatomic, readonly) NSArray *children;
 @property (nonatomic, readonly) NSDictionary *attributes;
 @property (nonatomic, readonly) NSString *tagName;
 @property (nonatomic, readonly) NSString *text;

@@ -51,4 +51,24 @@
     STAssertEquals(coachingYears.textAsInteger, 53, nil);
 }
 
+- (void)testAllChildren {
+    RXMLElement *rxml = [[RXMLElement elementWithFilepath:@"players.xml"] childWithPath:@"players"];
+    NSArray *children = rxml.children;
+    __block NSInteger coachCount = 0;
+    __block NSInteger playerCount = 0;
+    
+    STAssertTrue(children.count > 0, nil);
+    
+    [rxml iterateElements:children usingBlock:^(RXMLElement *element) {
+        if ([element.tagName isEqualToString:@"coach"]) {
+            coachCount++;
+        } else if ([element.tagName isEqualToString:@"player"]) {
+            playerCount++;
+        }
+    }];
+    
+    STAssertEquals(coachCount, 1, nil);
+    STAssertEquals(playerCount, 9, nil);
+}
+
 @end
