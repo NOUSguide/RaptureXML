@@ -27,8 +27,8 @@
     emptyXML_ = @"";
     emptyTopTagXML_ = @"<top></top>";
     childXML_ = @"<top><empty_child></empty_child><text_child>foo</text_child></top>";
-    childrenXML_ = @"<top><child></child><child></child><child></child></top>";
-    attributeXML_ = @"<top foo=\"bar\"></top>";
+    childrenXML_ = @"<top><child/><child/><child/></top>";
+    attributeXML_ = @"<top foo=\"bar\"/>";
     namespaceXML_ = @"<ns:top xmlns:ns=\"*\" ns:foo=\"bar\" ns:one=\"1\"><ns:text>something</ns:text></ns:top>";
 }
 
@@ -80,6 +80,23 @@
     RXMLElement *rxml = [RXMLElement elementWithString:namespaceXML_ encoding:NSUTF8StringEncoding];
     STAssertTrue(rxml.isValid, nil);
     STAssertEquals([rxml childrenWithTagName:@"text" inNamespace:@"*"].count, 1U, nil);
+}
+
+- (void)testNamespace {
+    RXMLElement *rxml = [RXMLElement elementWithString:namespaceXML_ encoding:NSUTF8StringEncoding];
+    
+    STAssertTrue([rxml.namespacePrefix isEqualToString:@"ns"], nil);
+    STAssertTrue([rxml.namespaceHref isEqualToString:@"*"], nil);
+}
+
+- (void)testDescription {
+    RXMLElement *rxml = [RXMLElement elementWithString:attributeXML_ encoding:NSUTF8StringEncoding];
+    
+    STAssertEqualObjects(attributeXML_, rxml.description, nil);
+    
+    rxml = [RXMLElement elementWithString:childrenXML_ encoding:NSUTF8StringEncoding];
+    
+    STAssertEqualObjects(childrenXML_, rxml.description, nil);
 }
 
 @end

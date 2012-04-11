@@ -48,6 +48,8 @@
 @synthesize attributes = _attributes;
 @synthesize text = _text;
 @synthesize tagName = _tagName;
+@synthesize namespacePrefix = _namespacePrefix;
+@synthesize namespaceHref = _namespaceHref;
 
 ////////////////////////////////////////////////////////////////////////
 #pragma mark - Class Methods
@@ -162,8 +164,32 @@
 #pragma mark - NSObject
 ////////////////////////////////////////////////////////////////////////
 
+// TODO: Doesn't work with mixed content yet
 - (NSString *)description {
-    return self.text;
+    NSMutableString *description = [NSMutableString string];
+    NSArray *children = self.children;
+	
+    [description appendFormat:@"<%@", self.tagName];
+
+	for (NSString *attributeName in self.attributes) {
+		NSString *attributeValue = [self.attributes objectForKey:attributeName];
+		
+        [description appendFormat:@" %@=\"%@\"", attributeName, attributeValue];
+	}
+	
+	if (children.count > 0) {
+		[description appendString:@">"];
+        
+		for (RXMLElement *child in children) {
+			[description appendString:child.description];
+		}
+        
+		[description appendFormat:@"</%@>", self.tagName];
+	} else {
+		[description appendString:@"/>"];
+	}
+    
+	return [description copy];
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -216,6 +242,22 @@
     }
     
     return _text;
+}
+
+- (NSString *)namespacePrefix {
+    if (_namespacePrefix == nil) {
+        _namespacePrefix = [NSString stringWithUTF8String:(const char *)_node->ns->prefix];
+    }
+    
+    return _namespacePrefix;
+}
+
+- (NSString *)namespaceHref {
+    if (_namespaceHref == nil) {
+        _namespaceHref = [NSString stringWithUTF8String:(const char *)_node->ns->href];
+    }
+    
+    return _namespaceHref;
 }
 
 - (NSInteger)textAsInteger {

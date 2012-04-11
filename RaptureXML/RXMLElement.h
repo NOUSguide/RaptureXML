@@ -43,6 +43,8 @@ typedef void (^RXMLBlock)(RXMLElement *element);
 @property (nonatomic, readonly) NSDictionary *attributes;
 @property (nonatomic, readonly) NSString *tagName;
 @property (nonatomic, readonly) NSString *text;
+@property (nonatomic, readonly) NSString *namespacePrefix;
+@property (nonatomic, readonly) NSString *namespaceHref;
 @property (nonatomic, readonly) NSInteger textAsInteger;
 @property (nonatomic, readonly) double textAsDouble;
 @property (nonatomic, readonly, getter = isValid) BOOL valid;
