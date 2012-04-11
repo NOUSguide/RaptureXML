@@ -36,7 +36,7 @@
 
 - (void)testMissingTag {
     RXMLElement *rxml = [RXMLElement elementWithString:simplifiedXML_ encoding:NSUTF8StringEncoding];
-    RXMLElement *hexagon = [rxml childWithTagName:@"hexagon"];
+    RXMLElement *hexagon = [rxml childWithPath:@"hexagon"];
     
     STAssertNil(hexagon, nil);
 }

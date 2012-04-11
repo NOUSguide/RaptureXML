@@ -153,7 +153,7 @@
 }
 
 - (void)dealloc {
-    if (_document != nil) {
+    if (_document != NULL) {
         xmlFreeDoc(_document);
     }
 }
@@ -264,8 +264,8 @@
 #pragma mark - Child Nodes
 ////////////////////////////////////////////////////////////////////////
 
-- (RXMLElement *)childWithTagName:(NSString *)tagName {
-    NSArray *components = [tagName componentsSeparatedByString:@"."];
+- (RXMLElement *)childWithPath:(NSString *)path {
+    NSArray *components = [path componentsSeparatedByString:@"."];
     xmlNodePtr currentNode = _node;
     
     // navigate down
@@ -301,8 +301,8 @@
     return nil;
 }
 
-- (RXMLElement *)childWithTagName:(NSString *)tagName inNamespace:(NSString *)xmlNamespace {
-    NSArray *components = [tagName componentsSeparatedByString:@"."];
+- (RXMLElement *)childWithPath:(NSString *)path inNamespace:(NSString *)xmlNamespace {
+    NSArray *components = [path componentsSeparatedByString:@"."];
     xmlNodePtr currentNode = _node;
     const xmlChar *namespaceC = (const xmlChar *)[xmlNamespace cStringUsingEncoding:NSUTF8StringEncoding];
     

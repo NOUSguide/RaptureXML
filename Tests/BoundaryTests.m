@@ -60,14 +60,14 @@
 - (void)testChild {
     RXMLElement *rxml = [RXMLElement elementWithString:childXML_ encoding:NSUTF8StringEncoding];
     STAssertTrue(rxml.isValid, nil);
-    STAssertEqualObjects([rxml childWithTagName:@"empty_child"].text, @"", nil);
-    STAssertEqualObjects([rxml childWithTagName:@"text_child"].text, @"foo", nil);
+    STAssertEqualObjects([rxml childWithPath:@"empty_child"].text, @"", nil);
+    STAssertEqualObjects([rxml childWithPath:@"text_child"].text, @"foo", nil);
 }
 
 - (void)testNamespaceChild {
     RXMLElement *rxml = [RXMLElement elementWithString:namespaceXML_ encoding:NSUTF8StringEncoding];
     STAssertTrue(rxml.isValid, nil);
-    STAssertEqualObjects([rxml childWithTagName:@"text" inNamespace:@"*"].text, @"something", nil);
+    STAssertEqualObjects([rxml childWithPath:@"text" inNamespace:@"*"].text, @"something", nil);
 }
 
 - (void)testChildren {

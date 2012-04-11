@@ -71,8 +71,8 @@ typedef void (^RXMLBlock)(RXMLElement *element);
 - (double)attributeAsDouble:(NSString *)attributeName;
 - (double)attributeAsDouble:(NSString *)attributeName inNamespace:(NSString *)xmlNamespace;
 
-- (RXMLElement *)childWithTagName:(NSString *)tagName;
-- (RXMLElement *)childWithTagName:(NSString *)tagName inNamespace:(NSString *)xmlNamespace;
+- (RXMLElement *)childWithPath:(NSString *)path;
+- (RXMLElement *)childWithPath:(NSString *)path inNamespace:(NSString *)xmlNamespace;
 
 - (NSArray *)childrenWithTagName:(NSString *)tagName;
 - (NSArray *)childrenWithTagName:(NSString *)tagName inNamespace:(NSString *)xmlNamespace;
