@@ -49,9 +49,9 @@
     
     [rxml iteratePath:@"*" usingBlock:^(RXMLElement *e) {
         if (i == 0) {
-            STAssertEquals([e childWithPath:@"id"].textAsInteger, 1, nil);
+            STAssertEquals([[e childWithPath:@"id"].text integerValue], 1, nil);
         } else if (i == 1) {
-            STAssertEqualsWithAccuracy([e childWithPath:@"id"].textAsDouble, 2.5, 0.01, nil);
+            STAssertEqualsWithAccuracy([[e childWithPath:@"id"].text doubleValue], 2.5, 0.01, nil);
         }
         
         i++;
@@ -64,11 +64,11 @@
     
     [rxml iteratePath:@"*" usingBlock:^(RXMLElement *e) {
         if (i == 0) {
-            STAssertEquals([e attributeAsInteger:@"id"], 1, nil);
+            STAssertEquals([[e attribute:@"id"] integerValue], 1, nil);
         } else if (i == 1) {
-            STAssertEqualsWithAccuracy([e attributeAsDouble:@"id"], 2.5, 0.01, nil);
+            STAssertEqualsWithAccuracy([[e attribute:@"id"] doubleValue], 2.5, 0.01, nil);
         } else if (i == 2) {
-            STAssertEquals([e attributeAsInteger:@"id"], 3, nil);
+            STAssertEquals([[e attribute:@"id"] integerValue], 3, nil);
         }
         
         i++;

@@ -54,7 +54,7 @@
     RXMLElement *rxml = [RXMLElement elementWithString:namespaceXML_ encoding:NSUTF8StringEncoding];
     STAssertTrue(rxml.isValid, nil);
     STAssertEqualObjects([rxml attribute:@"foo" inNamespace:@"*"], @"bar", nil);
-    STAssertEquals([rxml attributeAsInteger:@"one" inNamespace:@"*"], 1, nil);
+    STAssertEquals([[rxml attribute:@"one" inNamespace:@"*"] integerValue], 1, nil);
 }
 
 - (void)testChild {

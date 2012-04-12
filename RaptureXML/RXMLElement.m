@@ -260,14 +260,6 @@
     return _namespaceHref;
 }
 
-- (NSInteger)textAsInteger {
-    return [self.text integerValue];
-}
-
-- (double)textAsDouble {
-    return [self.text doubleValue];
-}
-
 - (NSString *)attribute:(NSString *)attributeName {
     return [self.attributes objectForKey:attributeName];
 }
@@ -280,22 +272,6 @@
     }
     
     return nil;
-}
-
-- (NSInteger)attributeAsInteger:(NSString *)attributeName {
-    return [[self attribute:attributeName] integerValue];
-}
-
-- (NSInteger)attributeAsInteger:(NSString *)attributeName inNamespace:(NSString *)xmlNamespace {
-    return [[self attribute:attributeName inNamespace:xmlNamespace] integerValue];
-}
-
-- (double)attributeAsDouble:(NSString *)attributeName {
-    return [[self attribute:attributeName] doubleValue];
-}
-
-- (double)attributeAsDouble:(NSString *)attributeName inNamespace:(NSString *)xmlNamespace {
-    return [[self attribute:attributeName inNamespace:xmlNamespace] doubleValue];
 }
 
 - (BOOL)isValid {

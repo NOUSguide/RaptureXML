@@ -38,7 +38,7 @@
     // count the players
     RXMLElement *coachingYears = [rxml childWithPath:@"players.coach.experience.years"];
     
-    STAssertEquals(coachingYears.textAsInteger, 1, nil);
+    STAssertEquals([coachingYears.text integerValue], 1, nil);
 }
 
 - (void)testDeepChildQueryWithWildcard {
@@ -48,7 +48,7 @@
     RXMLElement *coachingYears = [rxml childWithPath:@"players.coach.experience.teams.*"];
     
     // first team returned
-    STAssertEquals(coachingYears.textAsInteger, 53, nil);
+    STAssertEquals([coachingYears.text integerValue], 53, nil);
 }
 
 - (void)testAllChildren {

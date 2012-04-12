@@ -31,7 +31,6 @@
 
 #import <Foundation/Foundation.h>
 #import <libxml/xmlreader.h>
-#import <libxml/xmlmemory.h>
 
 @class RXMLElement;
 
@@ -45,8 +44,6 @@ typedef void (^RXMLBlock)(RXMLElement *element);
 @property (nonatomic, readonly) NSString *text;
 @property (nonatomic, readonly) NSString *namespacePrefix;
 @property (nonatomic, readonly) NSString *namespaceHref;
-@property (nonatomic, readonly) NSInteger textAsInteger;
-@property (nonatomic, readonly) double textAsDouble;
 @property (nonatomic, readonly, getter = isValid) BOOL valid;
 
 + (id)elementWithString:(NSString *)xmlString encoding:(NSStringEncoding)encoding;
@@ -67,12 +64,6 @@ typedef void (^RXMLBlock)(RXMLElement *element);
 
 - (NSString *)attribute:(NSString *)attributeName;
 - (NSString *)attribute:(NSString *)attributeName inNamespace:(NSString *)xmlNamespace;
-
-- (NSInteger)attributeAsInteger:(NSString *)attributeName;
-- (NSInteger)attributeAsInteger:(NSString *)attributeName inNamespace:(NSString *)xmlNamespace;
-
-- (double)attributeAsDouble:(NSString *)attributeName;
-- (double)attributeAsDouble:(NSString *)attributeName inNamespace:(NSString *)xmlNamespace;
 
 - (RXMLElement *)childWithPath:(NSString *)path;
 - (RXMLElement *)childWithPath:(NSString *)path inNamespace:(NSString *)xmlNamespace;
